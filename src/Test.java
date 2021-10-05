@@ -51,12 +51,13 @@ class Test{
 
 
     public static void main(String[] args) {
-        int n = 23;
-        String s = "";
-        s = s.format("%" + (-20) + "s", "Arijit");
-        System.out.println(s + n);
-        s = s.format("%" + (-20) + "s", "Arijit Chabri");
-        System.out.println(s + n);
+//        int n = 23;
+//        String s = "";
+//        s = s.format("%" + (-20) + "s", "Arijit");
+//        System.out.println(s + n);
+//        s = s.format("%" + (-20) + "s", "Arijit Chabri");
+//        System.out.println(s + n);
+        System.out.printf("Name %20s\n", "Roll");
 
 
     }

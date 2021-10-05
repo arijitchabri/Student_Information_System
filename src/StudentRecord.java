@@ -37,9 +37,10 @@ public class StudentRecord {
     }
 
     public static void printStudents(){
-        System.out.println(       "Name        Roll");
+        System.out.printf("Name %20s\n", "Roll");
         for (int i = 0; i < index; i++){
-            System.out.println(names[i] + "        " + rollNumber[i]);
+            String name = String.format("%" + (-22) + "s", names[i]);
+            System.out.println(name + rollNumber[i]);
         }
     }
 
