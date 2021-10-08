@@ -64,6 +64,7 @@ public class StudentRecord {
             names[pos] = name;
             rollNumber[pos] = roll;
             sort(pos);
+            System.out.println("Student record updated.");
             return;
         }
         System.out.println("The roll number exist can't add new student.");
@@ -87,9 +88,14 @@ public class StudentRecord {
         System.out.println("Student added successfully");
     }
 
-    public static void printStudent(int index) {
+    public static void printStudent(int pos) {
         System.out.println("Name        Roll");
-        System.out.println(names[index] + "        " + rollNumber[index]);
+        int ind = binarySearch(pos, 0, index);
+        if (pos == -1){
+            System.out.println("Student does not exist.");
+            return;
+        }
+        System.out.println(names[binarySearch(pos, 0, index)] + "        " + rollNumber[binarySearch(pos, 0, index)]);
     }
 
     public static void printStudents() {
@@ -109,7 +115,7 @@ public class StudentRecord {
         if (pos != -1) {
             updateStudent(pos);
             flag = true;
-            System.out.println("Student record Updated.");
+            return;
         }
         try{
 
