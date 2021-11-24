@@ -144,10 +144,14 @@ public class Student_record {
     }
 
     static void getAllDetails(){
-
+        databaseHandler.getAllDetails();
     }
     static void runYourOwnQuarry(){
-
+        String quarry;
+        System.out.println("Enter your quarry : ");
+        quarry = sc.nextLine();
+        quarry = sc.nextLine();
+        databaseHandler.customQuarry(quarry);
     }
 
 

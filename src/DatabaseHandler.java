@@ -228,7 +228,20 @@ ID    Sem1  Sem2  Sem3  Sem4  Sem5  Sem6""");
 
             rs = ps.executeQuery();
 
-            printFormatter(rs);
+            while(rs.next()){
+                String str;
+                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++){
+                    if (rs.getObject(i) instanceof  String){
+                        str = rs.getObject(i).toString();
+                        System.out.print(truncate(str) + "     ");
+                    }
+                    else{
+                        System.out.print(rs.getObject(i) + "     ");
+                    }
+                }
+                System.out.println();
+            }
+
         }
         catch (SQLException se){
             se.printStackTrace();
