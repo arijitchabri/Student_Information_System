@@ -18,8 +18,6 @@ public class DatabaseHandler {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             stmt = conn.createStatement();
-            String sql = "select * from student";
-            rs = stmt.executeQuery(sql);
 
 
         }
@@ -41,7 +39,7 @@ public class DatabaseHandler {
             ps.setString(2, stu.name);
             ps.setString(3, stu.dep);
 
-            int er = ps.executeUpdate();
+            ps.executeUpdate();
 
         }
         catch (SQLException se){
@@ -56,7 +54,7 @@ public class DatabaseHandler {
             ps.setString(2, stu.dep);
             ps.setInt(3, stu.id);
 
-            int er = ps.executeUpdate();
+            ps.executeUpdate();
 
         }
         catch (SQLException se){
@@ -67,7 +65,6 @@ public class DatabaseHandler {
     static void delete(int id){
         
         try{
-            String sql = "delete from student where id = ?";
             PreparedStatement ps = conn.prepareStatement("delete from student where id = ?");
             ps.setInt(1, id);
             ps.executeUpdate();
@@ -83,13 +80,9 @@ public class DatabaseHandler {
             String sql = "select * from student";
             rs = stmt.executeQuery(sql);
             System.out.println("\nThe Database is : \n");
-            while(rs.next()){
-                System.out.print("id : " + rs.getInt("id"));
-                System.out.print(" name : "+rs.getString("name"));
-                System.out.print(" dept : " + rs.getString("dept"));
-                System.out.println();
-            }
-            System.out.println();
+            System.out.println("""
+DEPT       Name                      ID""");
+            printFormatter(rs);
 
         }
         catch (SQLException se){
@@ -99,19 +92,32 @@ public class DatabaseHandler {
 
     static void getStudentDetails(int id){
         try{
-            PreparedStatement ps = conn.prepareStatement("select * from student where id = ?");
+            PreparedStatement ps = conn.prepareStatement("select * from exam_details left join student on exam_details.id = student.id where student.id = ?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
+            System.out.println("""
+DEPT       Name                     ID    Sem1  Sem2  Sem3  Sem4  Sem5  Sem6""");
             while(rs.next()){
-                System.out.print("id : " + rs.getInt("id"));
-                System.out.print(" name : "+rs.getString("name"));
-                System.out.print(" dept : " + rs.getString("dept"));
+                String str;
+                for (int i = rs.getMetaData().getColumnCount(); i > 0 ; i--){
+                    if (i == 7)continue;
+                    if (rs.getObject(i) instanceof  String){
+                        str = rs.getObject(i).toString();
+                        System.out.print(truncate(str) + "     ");
+                    }
+                    else{
+                        System.out.print(rs.getObject(i) + "     ");
+                    }
+                }
                 System.out.println();
             }
 
         }
         catch (SQLException se){
             se.printStackTrace();
+        }
+        finally {
+            System.out.println("\n");
         }
 
     }
@@ -133,28 +139,184 @@ public class DatabaseHandler {
   // Exam Record          ..............................................................
 
 
-    void addExamDetails(){
+    static void addExamDetails(Exam exam){
+        try{
+
+            PreparedStatement ps = conn.prepareStatement("insert into exam_details values (?, ?, ?, ?, ?, ?, ?)" );
+
+            ps.setInt(1, exam.sem_1);
+            ps.setInt(2, exam.sem_2);
+            ps.setInt(3, exam.sem_3);
+            ps.setInt(4, exam.sem_4);
+            ps.setInt(5, exam.sem_5);
+            ps.setInt(6, exam.sem_6);
+            ps.setInt(7, exam.id);
+
+            ps.executeUpdate();
+
+
+        }catch (SQLException se){
+            se.printStackTrace();
+        }
 
     }
 
-    void updateMarks(){
+    static void updateMarks(Exam exam){
+        try{
+            PreparedStatement ps = conn.prepareStatement("update exam_details set sem_1 = ?, sem_2 = ?, sem_3 = ?, sem_4 = ?, sem_5 = ?, sem_6 = ? where id = ?");
+            ps.setInt(1, exam.sem_1);
+            ps.setInt(2, exam.sem_2);
+            ps.setInt(3, exam.sem_3);
+            ps.setInt(4, exam.sem_4);
+            ps.setInt(5, exam.sem_5);
+            ps.setInt(6, exam.sem_6);
+            ps.setInt(7, exam.id);
+
+            ps.executeUpdate();
+        }
+        catch (SQLException se){
+            se.printStackTrace();
+        }
+    }
+
+    static void deleteExamDetails(int id){
+        try{
+            PreparedStatement ps = conn.prepareStatement("delete from exam_details where id = ?");
+            ps.setInt(1, id);
+
+            ps.executeUpdate();
+        }
+        catch (SQLException se){
+            se.printStackTrace();
+        }
 
     }
 
-    void deleteExamDetails(){
+    static void getExamDetails(int id){
+        try{
+            System.out.println("id   sem6  sem5  sem4  sem3  sem2  sem1");
+            PreparedStatement ps = conn.prepareStatement("select * from exam_details where id = ?");
+            ps.setInt(1, id);
 
+            rs = ps.executeQuery();
+
+            printFormatter(rs);
+        }
+        catch (SQLException se){
+            se.printStackTrace();
+        }
     }
 
-    void getExamDetails(){
+    static void getExamDetails(){
+        try{
+            PreparedStatement ps = conn.prepareStatement("select * from exam_details");
 
+            rs = ps.executeQuery();
+
+            System.out.println("""
+ID    Sem1  Sem2  Sem3  Sem4  Sem5  Sem6""");
+            printFormatter(rs);
+        }
+        catch (SQLException se){
+            se.printStackTrace();
+        }
     }
 
-    void getExamDetails(int id){
+    static void customQuarry(String quarry){
+        try{
+            PreparedStatement ps = conn.prepareStatement(quarry);
 
+            rs = ps.executeQuery();
+
+            printFormatter(rs);
+        }
+        catch (SQLException se){
+            se.printStackTrace();
+        }
+    }
+
+    static void getAllDetails(){
+        try{
+            PreparedStatement ps = conn.prepareStatement("select * from exam_details left join student on student.id = exam_details.id");
+
+            rs = ps.executeQuery();
+            System.out.println("""
+DEPT       Name                     ID    Sem1  Sem2  Sem3  Sem4  Sem5  Sem6""");
+            while(rs.next()){
+                String str;
+                for (int i = rs.getMetaData().getColumnCount(); i > 0 ; i--){
+                    if (i == 7)continue;
+                    if (rs.getObject(i) instanceof  String){
+                        str = rs.getObject(i).toString();
+                        System.out.print(truncate(str) + "     ");
+                    }
+                    else{
+                        System.out.print(rs.getObject(i) + "     ");
+                    }
+                }
+                System.out.println();
+            }
+        }
+        catch (SQLException se){
+            se.printStackTrace();
+        }
+        finally {
+            System.out.println("\n");
+        }
+    }
+
+    static String truncate(String str){
+        if (str.length() < 8){
+            for (int i = 8; i > str.length(); i--){
+                str = str + " ";
+            }
+            return str;
+        }
+        else{
+            int len = 20 - str.length();
+            if (len > 0){
+                for (int i = 0; i <= len; i++){
+                    str = str + " ";
+                }
+                return str;
+            }
+            else{
+                str = str.substring(0,19);
+            }
+            return str;
+        }
+    }
+
+    static void printFormatter(ResultSet rs){
+        try{
+            while(rs.next()){
+                String str;
+                for (int i = rs.getMetaData().getColumnCount(); i > 0 ; i--){
+                    if (rs.getObject(i) instanceof  String){
+                        str = rs.getObject(i).toString();
+                        System.out.print(truncate(str) + "     ");
+                    }
+                    else{
+                        System.out.print(rs.getObject(i) + "     ");
+                    }
+                }
+                System.out.println();
+            }
+        }
+        catch(SQLException se){
+            se.printStackTrace();
+        }
+        finally {
+            System.out.println("\n");
+        }
     }
 
 
     public static void main(String[] args) {
-
+        getStudentsDetails();
+        getStudentDetails(1);
+        getAllDetails();
+        getExamDetails();
+        getExamDetails(1);
     }
 }
